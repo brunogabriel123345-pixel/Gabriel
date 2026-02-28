@@ -1,167 +1,183 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService") -- Para animações suaves
 
--- CONFIGURAÇÕES
+-- CONFIGURAÇÕES ORIGINAIS (MANTIDAS)
 local LINK_DISCORD = "https://discord.gg/2rK2sRTf"
 local LINK_GAMEPASS = "https://www.roblox.com/pt/game-pass/1731556830/Key-primion-scripy-killer"
 local LINK_GET_KEY = "https://link-encurtador.com/exemplo" 
 local KEY_CORRETA = "key-htpjvg"
 
--- Cores
-local COR_VERDE_CLARO = Color3.fromRGB(46, 204, 113)
-local COR_VERDE_ESCURO = Color3.fromRGB(39, 174, 96)
-local COR_DOURADO = Color3.fromRGB(255, 215, 0)
-local COR_DISCORD = Color3.fromRGB(88, 101, 242)
-local COR_ERRO = Color3.fromRGB(255, 0, 0)
-local COR_PAINEL = Color3.fromRGB(20, 20, 20)
+-- CORES MODERNAS (ESTILO PREMIUM)
+local BACKGROUND_DARK = Color3.fromRGB(15, 15, 15)
+local ACCENT_GLOW = Color3.fromRGB(0, 255, 127) -- Neon Green
+local PRIMION_GOLD = Color3.fromRGB(255, 180, 0)
+local DISCORD_PURPLE = Color3.fromRGB(114, 137, 218)
+local ERROR_RED = Color3.fromRGB(255, 50, 50)
 
 -----------------------------------------------------------
--- 1. TELA DE BLOQUEIO (KEY SYSTEM)
+-- 1. TELA DE BLOQUEIO (VISUAL UPGRADE)
 -----------------------------------------------------------
 local screenBlock = Instance.new("ScreenGui")
-screenBlock.Name = "TelaBloqueioPro"
+screenBlock.Name = "PrimionKeySystemV2"
 screenBlock.IgnoreGuiInset = true
 screenBlock.Parent = playerGui
 
-local frameBlock = Instance.new("Frame")
-frameBlock.Size = UDim2.new(1, 0, 1, 0)
-frameBlock.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
-frameBlock.Active = true
-frameBlock.Parent = screenBlock
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 450, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -160)
+mainFrame.BackgroundColor3 = BACKGROUND_DARK
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenBlock
 
-local layoutBlock = Instance.new("UIListLayout")
-layoutBlock.Padding = UDim.new(0, 15)
-layoutBlock.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layoutBlock.VerticalAlignment = Enum.VerticalAlignment.Center
-layoutBlock.Parent = frameBlock
+local corner = Instance.new("UICorner", mainFrame)
+corner.CornerRadius = UDim.new(0, 15)
 
-local btnDiscord = Instance.new("TextButton")
-btnDiscord.Size = UDim2.new(0.3, 0, 0.06, 0)
-btnDiscord.BackgroundColor3 = COR_DISCORD
-btnDiscord.Text = "🎧 ATENDIMENTO / SUPORTE"
-btnDiscord.TextColor3 = Color3.fromRGB(255, 255, 255)
-btnDiscord.Font = Enum.Font.GothamBold
-btnDiscord.TextSize = 16
-btnDiscord.Parent = frameBlock
-Instance.new("UICorner", btnDiscord)
+-- Borda Neon
+local stroke = Instance.new("UIStroke")
+stroke.Color = ACCENT_GLOW
+stroke.Thickness = 2
+stroke.Transparency = 0.5
+stroke.Parent = mainFrame
 
-local container = Instance.new("Frame")
-container.Size = UDim2.new(0.6, 0, 0.07, 0)
-container.BackgroundTransparency = 1
-container.Parent = frameBlock
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 60)
+title.Text = "PRIMION KEY SYSTEM"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.BackgroundTransparency = 1
+title.Parent = mainFrame
+
+-- Layout principal
+local content = Instance.new("Frame")
+content.Size = UDim2.new(0.9, 0, 0.7, 0)
+content.Position = UDim2.new(0.05, 0, 0.2, 0)
+content.BackgroundTransparency = 1
+content.Parent = mainFrame
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 12)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.Parent = content
+
+-- Caixa de Entrada (Estilizada)
+local inputKey = Instance.new("TextBox")
+inputKey.Size = UDim2.new(1, 0, 0, 45)
+inputKey.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+inputKey.PlaceholderText = "Insira sua chave aqui..."
+inputKey.Text = ""
+inputKey.TextColor3 = Color3.new(1, 1, 1)
+inputKey.Font = Enum.Font.Gotham
+inputKey.TextSize = 14
+inputKey.Parent = content
+Instance.new("UICorner", inputKey).CornerRadius = UDim.new(0, 8)
+
+-- Container de Botões
+local btnContainer = Instance.new("Frame")
+btnContainer.Size = UDim2.new(1, 0, 0, 45)
+btnContainer.BackgroundTransparency = 1
+btnContainer.Parent = content
 
 local grid = Instance.new("UIGridLayout")
 grid.CellSize = UDim2.new(0.31, 0, 1, 0)
-grid.CellPadding = UDim2.new(0.02, 0, 0, 0)
-grid.HorizontalAlignment = Enum.HorizontalAlignment.Center
-grid.Parent = container
+grid.CellPadding = UDim2.new(0.03, 0, 0, 0)
+grid.Parent = btnContainer
 
-local btnGet = Instance.new("TextButton")
-btnGet.Text = "GET KEY"
-btnGet.Font = Enum.Font.GothamBold
-btnGet.BackgroundColor3 = COR_VERDE_CLARO
-btnGet.Parent = container
-Instance.new("UICorner", btnGet)
+-- Função para criar botões estilizados
+local function StyleButton(btn, color, text)
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextColor3 = (color == PRIMION_GOLD) and Color3.new(0,0,0) or Color3.new(1,1,1)
+    btn.BackgroundColor3 = color
+    btn.TextSize = 14
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    
+    -- Efeito de clique
+    btn.MouseButton1Down:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(0.95, 0, 0.95, 0)}):Play()
+    end)
+    btn.MouseButton1Up:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+    end)
+end
 
-local btnCheck = Instance.new("TextButton")
-btnCheck.Text = "CHECK KEY"
-btnCheck.Font = Enum.Font.GothamBold
-btnCheck.BackgroundColor3 = COR_VERDE_ESCURO
-btnCheck.Parent = container
-Instance.new("UICorner", btnCheck)
+local btnGet = Instance.new("TextButton", btnContainer)
+StyleButton(btnGet, Color3.fromRGB(46, 204, 113), "GET KEY")
 
-local btnPrimion = Instance.new("TextButton")
-btnPrimion.Text = "KEY PRIMION"
-btnPrimion.BackgroundColor3 = COR_DOURADO
-btnPrimion.TextColor3 = Color3.fromRGB(0, 0, 0)
-btnPrimion.Font = Enum.Font.GothamBold
-btnPrimion.Parent = container
-Instance.new("UICorner", btnPrimion)
+local btnCheck = Instance.new("TextButton", btnContainer)
+StyleButton(btnCheck, ACCENT_GLOW, "CHECK")
 
-local inputKey = Instance.new("TextBox")
-inputKey.Size = UDim2.new(0.4, 0, 0.06, 0)
-inputKey.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-inputKey.PlaceholderText = "Cole a sua chave aqui..."
-inputKey.Text = ""
-inputKey.TextColor3 = Color3.fromRGB(255, 255, 255)
-inputKey.Font = Enum.Font.Gotham
-inputKey.Parent = frameBlock
-Instance.new("UICorner", inputKey)
+local btnPrimion = Instance.new("TextButton", btnContainer)
+StyleButton(btnPrimion, PRIMION_GOLD, "PREMIUM")
 
-local txtInfo = Instance.new("TextLabel")
-txtInfo.Size = UDim2.new(0.8, 0, 0.05, 0)
-txtInfo.BackgroundTransparency = 1
-txtInfo.Text = "Obtenha a Key Grátis em 'Get Key' ou adquira a Key Primion Lifetime (não expira)."
-txtInfo.TextColor3 = Color3.fromRGB(200, 200, 200)
-txtInfo.Font = Enum.Font.GothamMedium
-txtInfo.TextSize = 14
-txtInfo.Parent = frameBlock
+local btnDiscord = Instance.new("TextButton")
+btnDiscord.Size = UDim2.new(1, 0, 0, 40)
+btnDiscord.BackgroundColor3 = DISCORD_PURPLE
+StyleButton(btnDiscord, DISCORD_PURPLE, "JOIN DISCORD SUPPORT")
+btnDiscord.Parent = content
 
 local feedback = Instance.new("TextLabel")
-feedback.Size = UDim2.new(0.8, 0, 0.05, 0)
+feedback.Size = UDim2.new(1, 0, 0, 20)
 feedback.BackgroundTransparency = 1
 feedback.Text = ""
-feedback.Font = Enum.Font.GothamBold
-feedback.Parent = frameBlock
+feedback.Font = Enum.Font.GothamMedium
+feedback.TextSize = 14
+feedback.Parent = content
 
 -----------------------------------------------------------
 -- 2. PAINEL DE FUNÇÕES (ABRE APÓS A KEY)
 -----------------------------------------------------------
 local function AbrirPainelPrincipal()
-    screenBlock:Destroy() -- Deleta a tela de bloqueio
+    screenBlock:Destroy() 
 
     local mainGui = Instance.new("ScreenGui")
     mainGui.Name = "PrimionHub"
     mainGui.Parent = playerGui
 
-    -- Botão de Toggle (Abrir/Fechar)
     local toggleBtn = Instance.new("TextButton")
-    toggleBtn.Size = UDim2.new(0, 100, 0, 40)
+    toggleBtn.Size = UDim2.new(0, 120, 0, 40)
     toggleBtn.Position = UDim2.new(0, 10, 0.5, 0)
-    toggleBtn.BackgroundColor3 = COR_PAINEL
-    toggleBtn.Text = "ABRIR/FECHAR"
-    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleBtn.BackgroundColor3 = COR_PAINEL or BACKGROUND_DARK
+    toggleBtn.Text = "ABRIR PAINEL"
+    toggleBtn.TextColor3 = Color3.new(1,1,1)
     toggleBtn.Font = Enum.Font.GothamBold
-    toggleBtn.TextSize = 12
     toggleBtn.Parent = mainGui
     Instance.new("UICorner", toggleBtn)
 
-    -- Frame do Painel
     local mainFrame = Instance.new("Frame")
-    mainFrame.Name = "MainFrame"
     mainFrame.Size = UDim2.new(0, 300, 0, 350)
     mainFrame.Position = UDim2.new(0.5, -150, 0.5, -175)
-    mainFrame.BackgroundColor3 = COR_PAINEL
-    mainFrame.Visible = false -- Começa fechado
+    mainFrame.BackgroundColor3 = BACKGROUND_DARK
+    mainFrame.Visible = false
     mainFrame.Active = true
-    mainFrame.Draggable = true -- Permite arrastar o painel
+    mainFrame.Draggable = true
     mainFrame.Parent = mainGui
     Instance.new("UICorner", mainFrame)
+    Instance.new("UIStroke", mainFrame).Color = PRIMION_GOLD
 
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 50)
-    title.Text = "PRIMION EXECUTOR"
-    title.TextColor3 = COR_DOURADO
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 20
-    title.BackgroundTransparency = 1
-    title.Parent = mainFrame
+    local titleHub = Instance.new("TextLabel")
+    titleHub.Size = UDim2.new(1, 0, 0, 50)
+    titleHub.Text = "PRIMION EXECUTOR"
+    titleHub.TextColor3 = PRIMION_GOLD
+    titleHub.Font = Enum.Font.GothamBold
+    titleHub.TextSize = 18
+    titleHub.BackgroundTransparency = 1
+    titleHub.Parent = mainFrame
 
     local list = Instance.new("UIListLayout")
-    list.Padding = UDim.new(0, 10)
+    list.Padding = UDim.new(0, 8)
     list.HorizontalAlignment = Enum.HorizontalAlignment.Center
     list.Parent = mainFrame
 
-    -- Função para criar botões de cheat
     local function CreateCheatBtn(name, color)
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0.9, 0, 0, 45)
+        btn.Size = UDim2.new(0.9, 0, 0, 40)
         btn.BackgroundColor3 = color
         btn.Text = name
         btn.Font = Enum.Font.GothamBold
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextColor3 = Color3.new(1,1,1)
         btn.Parent = mainFrame
         Instance.new("UICorner", btn)
         return btn
@@ -169,50 +185,50 @@ local function AbrirPainelPrincipal()
 
     local flyBtn = CreateCheatBtn("FLY (VOAR)", Color3.fromRGB(52, 152, 219))
     local fpsBtn = CreateCheatBtn("FPS KILLER", Color3.fromRGB(231, 76, 60))
-    local noclipBtn = CreateCheatBtn("NOCLIP (ATRAVESSAR)", Color3.fromRGB(155, 89, 182))
+    local noclipBtn = CreateCheatBtn("NOCLIP", Color3.fromRGB(155, 89, 182))
     local crasherBtn = CreateCheatBtn("SERVER CRASHER", Color3.fromRGB(0, 0, 0))
 
-    -- Toggle Lógica
     toggleBtn.MouseButton1Click:Connect(function()
         mainFrame.Visible = not mainFrame.Visible
     end)
-
-    -- Ações dos Botões (Exemplo de print, você deve colocar seus scripts aqui)
-    flyBtn.MouseButton1Click:Connect(function() print("Fly Ativado") end)
-    fpsBtn.MouseButton1Click:Connect(function() print("FPS Killer Ativado") end)
-    noclipBtn.MouseButton1Click:Connect(function() print("Noclip Ativado") end)
-    crasherBtn.MouseButton1Click:Connect(function() print("Crasher Ativado") end)
 end
 
 -----------------------------------------------------------
--- LÓGICA DO KEY SYSTEM
+-- LÓGICA DO KEY SYSTEM (MANTIDA)
 -----------------------------------------------------------
 btnGet.MouseButton1Click:Connect(function()
     if setclipboard then setclipboard(LINK_GET_KEY) end
-    feedback.TextColor3 = COR_VERDE_CLARO
-    feedback.Text = "Link da chave copiado com sucesso!"
+    feedback.TextColor3 = Color3.new(1,1,1)
+    feedback.Text = "Link copiado! Verifique seu navegador."
 end)
 
 btnCheck.MouseButton1Click:Connect(function()
     if inputKey.Text == KEY_CORRETA then
-        feedback.TextColor3 = COR_VERDE_ESCURO
-        feedback.Text = "Acesso autorizado! Abrindo painel..."
+        feedback.TextColor3 = ACCENT_GLOW
+        feedback.Text = "Acesso autorizado! Carregando..."
         task.wait(1)
         AbrirPainelPrincipal()
     else
-        feedback.TextColor3 = COR_ERRO
-        feedback.Text = "Chave incorreta! Verifique e tente novamente."
+        feedback.TextColor3 = ERROR_RED
+        feedback.Text = "Chave inválida! Tente novamente."
+        -- Efeito de tremer na caixa de texto
+        local posOriginal = inputKey.Position
+        for i = 1, 5 do
+            inputKey.Position = posOriginal + UDim2.new(0, math.random(-5,5), 0, 0)
+            task.wait(0.05)
+        end
+        inputKey.Position = posOriginal
     end
 end)
 
 btnPrimion.MouseButton1Click:Connect(function()
     if setclipboard then setclipboard(LINK_GAMEPASS) end
-    feedback.TextColor3 = COR_DOURADO
-    feedback.Text = "Cole o link no seu navegador e pague 100 Robux para desbloquear."
+    feedback.TextColor3 = PRIMION_GOLD
+    feedback.Text = "Link do Gamepass Lifetime copiado!"
 end)
 
 btnDiscord.MouseButton1Click:Connect(function()
     if setclipboard then setclipboard(LINK_DISCORD) end
-    feedback.TextColor3 = COR_DISCORD
-    feedback.Text = "Link do suporte copiado!"
+    feedback.TextColor3 = DISCORD_PURPLE
+    feedback.Text = "Link do Discord copiado!"
 end)
